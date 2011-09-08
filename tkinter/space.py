@@ -1,26 +1,26 @@
 #!/usr/bin/env python
 
-from Tkinter import *
-
-master = Tk()
-
-canvas = Canvas(master, width=800, height=600, background='black')
-canvas.pack()
+from Tkinter import Tk, Canvas, mainloop
 
 class Grid(object):
     cell_size = 5
 
-    def __init__(self, canvas):
-        self.columns = int(canvas['width']) / self.cell_size
-        self.rows = int(canvas['height']) / self.cell_size
-        self.canvas = canvas
+    def __init__(self):
+        master = Tk()
+        self.canvas = Canvas(master, width=800, height=600, background='black')
+        self.canvas.pack()
+        self.columns = int(self.canvas['width']) / self.cell_size
+        self.rows = int(self.canvas['height']) / self.cell_size
 
-    def draw(self, x, y, tags=None):
+    def put(self, x, y, tags=None):
         self.canvas.create_rectangle(x * self.cell_size,
                                      y*self.cell_size,
                                      x * self.cell_size + self.cell_size,
                                      y*self.cell_size + self.cell_size, 
-                                     fill="white", outline="white", tags=tags)
+                                     fill="white", outline="white", tags=tags)a
+
+    def move(self, tags, dx, dy):
+        self.canvas.move(tags, dx*self.cell_size, dy*self.cell_size)
 
 class Unit(object):
     bitmap = None
@@ -30,18 +30,22 @@ class Unit(object):
         self.x = x
         self.y = y
         self.grid = grid
-        self.tags = (self.__class__.__name__, self.__class__.instance_count) + tags
+        self.tag = "%s_%d" % (self.__class_name__, self.__class__.instance_count)
+        self.extra_tags = (self.__class__.__name__, self.tag) + tags
         self.__class__.instance_count += 1
         
-    def draw(self):
+    def put(self):
         for j, line in enumerate(self.bitmap):
             for i, v in enumerate(line):
                 if v:
-                    self.grid.draw(self.x+i, self.y+j, self.tags)
+                    self.grid.put(self.x+i, self.y+j, self.extra_tags)
 
+    def move(self, dx, dy):
+        self.grid.move(self.tag, dx, dy)
 
-def testcase():
-    grid = Grid(canvas)
+testcase = True
+if testcase:
+    grid = Grid()
 
     class Spaceship(Unit):
         bitmap =((0,0,1,0,0),
@@ -54,10 +58,8 @@ def testcase():
 
     import random
     sp = Spaceship(grid, 80, 100)
-    sp.draw()
+    sp.put()
     for i, x in enumerate(range(10, 65, 5)):
         enemy = Enemy(grid, x, random.randint(1,10))
-        enemy.draw()
-#mainloop()
-testcase()
+        enemy.put()
 
