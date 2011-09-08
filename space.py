@@ -17,7 +17,7 @@ class Grid(object):
                                      y*self.cell_size,
                                      x * self.cell_size + self.cell_size,
                                      y*self.cell_size + self.cell_size, 
-                                     fill="white", outline="white", tags=tags)a
+                                     fill="white", outline="white", tags=tags)
 
     def move(self, tags, dx, dy):
         self.canvas.move(tags, dx*self.cell_size, dy*self.cell_size)
@@ -30,7 +30,7 @@ class Unit(object):
         self.x = x
         self.y = y
         self.grid = grid
-        self.tag = "%s_%d" % (self.__class_name__, self.__class__.instance_count)
+        self.tag = "%s_%d" % (self.__class__.__name__, self.__class__.instance_count)
         self.extra_tags = (self.__class__.__name__, self.tag) + tags
         self.__class__.instance_count += 1
         
@@ -42,24 +42,3 @@ class Unit(object):
 
     def move(self, dx, dy):
         self.grid.move(self.tag, dx, dy)
-
-testcase = True
-if testcase:
-    grid = Grid()
-
-    class Spaceship(Unit):
-        bitmap =((0,0,1,0,0),
-                 (1,0,1,0,1),
-                 (1,1,1,1,1))
-
-    class Enemy(Unit):
-        bitmap = ((1,0,1),
-                  (0,1,0))
-
-    import random
-    sp = Spaceship(grid, 80, 100)
-    sp.put()
-    for i, x in enumerate(range(10, 65, 5)):
-        enemy = Enemy(grid, x, random.randint(1,10))
-        enemy.put()
-
